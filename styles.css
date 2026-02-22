@@ -1,0 +1,211 @@
+/* =======================================
+   General Styles
+======================================= */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #1f1c2c, #928dab);
+    color: #fff;
+}
+
+.container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* =======================================
+   School Header
+======================================= */
+.school-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.school-header h2 {
+    margin: 5px 0;
+}
+
+.school-header p {
+    margin: 2px 0;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* =======================================
+   Card Styles (Login / Dashboard)
+======================================= */
+.card {
+    background: rgba(0,0,0,0.5);
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    margin-bottom: 20px;
+}
+
+.card h1 {
+    margin-top: 0;
+    text-align: center;
+    font-size: 28px;
+}
+
+.card .subtitle {
+    text-align: center;
+    font-size: 14px;
+    margin-bottom: 15px;
+    opacity: 0.8;
+}
+
+.card input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 5px;
+    border: none;
+}
+
+.card button {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 5px;
+    background: #17a2b8;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.card button:hover {
+    background: #138496;
+}
+
+.attack-btn {
+    background: #dc3545;
+}
+
+.attack-btn:hover {
+    background: #c82333;
+}
+
+/* =======================================
+   Status & Messages
+======================================= */
+.status {
+    text-align: center;
+    padding: 8px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    background: #28a745; /* default secure */
+}
+
+.info p {
+    margin: 4px 0;
+    font-size: 13px;
+}
+
+/* =======================================
+   Password Strength
+======================================= */
+#password-strength {
+    margin-top: 5px;
+}
+
+#strength-bar {
+    height: 6px;
+    width: 0%;
+    background: #dc3545;
+    border-radius: 4px;
+    transition: width 0.3s, background 0.3s;
+}
+
+#strength-text {
+    font-size: 12px;
+    margin-top: 2px;
+    opacity: 0.8;
+}
+
+/* =======================================
+   Security Log
+======================================= */
+.log-box {
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 5px;
+    max-height: 120px;
+    overflow-y: auto;
+    margin-top: 15px;
+}
+
+.log-box h3 {
+    margin: 0 0 5px 0;
+    font-size: 14px;
+    text-align: center;
+}
+
+.log-box p {
+    margin: 2px 0;
+    font-size: 12px;
+}
+
+/* =======================================
+   Admin Dashboard Table
+======================================= */
+.admin-dashboard {
+    margin: 30px auto;
+    max-width: 700px;
+    background: rgba(0,0,0,0.5);
+    padding: 15px;
+    border-radius: 8px;
+    color: white;
+}
+
+.admin-dashboard h2 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+#dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+#dashboard-table th, #dashboard-table td {
+    border: 1px solid #fff;
+    padding: 6px;
+    text-align: center;
+}
+
+#dashboard-table th {
+    background: #333;
+}
+
+/* =======================================
+   Shake Animation
+======================================= */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+
+.shake {
+    animation: shake 0.5s;
+}
+
+/* =======================================
+   Footer
+======================================= */
+footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+    opacity: 0.7;
+}

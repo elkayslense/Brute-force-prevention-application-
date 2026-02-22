@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Brute Force Prevention App | CYB 203 Demo</title>
+    <style>
+        body { margin:0; padding:0; font-family:Arial,sans-serif; background:linear-gradient(to right,#1f1c2c,#928dab); color:#fff; }
+        .container { width:100%; max-width:700px; margin:0 auto; padding:20px; }
+        .school-header { text-align:center; margin-bottom:20px; }
+        .school-header h2 { margin:5px 0; }
+        .school-header p { margin:2px 0; font-size:14px; opacity:0.8; }
+
+        .card { background:rgba(0,0,0,0.5); padding:25px; border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.4); margin-bottom:20px; }
+        .card h1 { text-align:center; font-size:28px; margin-top:0; }
+        .card .subtitle { text-align:center; font-size:14px; margin-bottom:15px; opacity:0.8; }
+        .card input { width:100%; padding:10px; margin:8px 0; border-radius:5px; border:none; }
+        .card button { width:100%; padding:10px; margin:8px 0; border:none; border-radius:5px; background:#17a2b8; color:#fff; font-weight:bold; cursor:pointer; transition:0.3s; }
+        .card button:hover { background:#138496; }
+        .attack-btn { background:#dc3545; }
+        .attack-btn:hover { background:#c82333; }
+
+        .status { text-align:center; padding:8px; border-radius:5px; margin-bottom:10px; font-weight:bold; background:#28a745; }
+        .info p { margin:4px 0; font-size:13px; }
+
+        #password-strength { margin-top:5px; }
+        #strength-bar { height:6px; width:0%; background:#dc3545; border-radius:4px; transition:width 0.3s, background 0.3s; }
+        #strength-text { font-size:12px; margin-top:2px; opacity:0.8; }
+
+        .log-box { background: rgba(255,255,255,0.1); padding:10px; border-radius:5px; max-height:120px; overflow-y:auto; margin-top:15px; }
+        .log-box h3 { margin:0 0 5px 0; font-size:14px; text-align:center; }
+        .log-box p { margin:2px 0; font-size:12px; }
+
+        .admin-dashboard { margin:30px auto; max-width:700px; background: rgba(0,0,0,0.5); padding:15px; border-radius:8px; color:white; display:none; }
+        .admin-dashboard h2 { text-align:center; margin-bottom:10px; }
+        #dashboard-table { width:100%; border-collapse:collapse; font-size:12px; }
+        #dashboard-table th, #dashboard-table td { border:1px solid #fff; padding:6px; text-align:center; }
+        #dashboard-table th { background:#333; }
+
+        @keyframes shake { 0%{transform:translateX(0);}25%{transform:translateX(-5px);}50%{transform:translateX(5px);}75%{transform:translateX(-5px);}100%{transform:translateX(0);} }
+        .shake { animation: shake 0.5s; }
+
+        footer { text-align:center; font-size:12px; opacity:0.7; margin-top:20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="school-header">
+        <h2>Federal University Dutse</h2>
+        <p>Department of Cyber Security</p>
+        <p>CYB 203 – Group 5 (Range 81–100 + DE Candidates)</p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="card" id="login-card">
+        <h1>🔐 Brute Force Prevention App</h1>
+        <p class="subtitle">Multi-User Access & Brute Force Protection</p>
+
+        <div class="status" id="status">System Secure</div>
+
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+
+        <div id="password-strength">
+            <div id="strength-bar"></div>
+            <p id="strength-text"></p>
+        </div>
+
+        <button onclick="login()">Login</button>
+        <button onclick="simulateAttack()" class="attack-btn">Simulate Brute Force Attack</button>
+
+        <div class="info">
+            <p id="message"></p>
+            <p id="attempts"></p>
+            <p id="timer"></p>
+        </div>
+
+        <div class="log-box">
+            <h3>Security Activity Log</h3>
+            <div id="log"></div>
+        </div>
+
+        <!-- Admin Dashboard Table (hidden initially) -->
+        <div class="admin-dashboard">
+            <h2>Admin Dashboard Preview</h2>
+            <table id="dashboard-table">
+                <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Username</th>
+                    <th>Action</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- User Dashboard -->
+    <div class="card" id="dashboard" style="display:none;">
+        <h1>📊 Dashboard</h1>
+        <p id="welcome"></p>
+        <p id="role"></p>
+        <p id="login-time"></p>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <footer>
+        &copy; 2026 Brute Force Prevention App. All rights reserved.<br>
+        <strong>Developed by:</strong> 200 Level Students | Federal University Dutse
+    </footer>
+</div>
+
+<script>
+const users = [
+    { username: "admin", password: "password123", role: "Admin" },
+    { username: "john", password: "john2026", role: "Member" },
+    { username: "mary", password: "mary2026", role: "Member" },
+    { username: "ibrahim", password: "ibra2026", role: "Member" }
+];
+
+let failedAttempts = 0;
+let maxAttempts = 3;
+let lockTime = 30;
+let countdownInterval;
+let isLocked = false;
+
+function addLog(message) {
+    const logBox = document.getElementById("log");
+    const time = new Date().toLocaleTimeString();
+    const logEntry = document.createElement("p");
+    logEntry.innerText = `[${time}] ${message}`;
+    logBox.prepend(logEntry);
+}
+function addDashboardLog(username, action, status) {
+    const tableBody = document.querySelector("#dashboard-table tbody");
+    const time = new Date().toLocaleTimeString();
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${time}</td><td>${username}</td><td>${action}</td><td>${status}</td>`;
+    tableBody.prepend(row);
+}
+
+const passwordInput = document.getElementById("password");
+const strengthBar = document.getElementById("strength-bar");
+const strengthText = document.getElementById("strength-text");
+passwordInput.addEventListener("input", () => {
+    const val = passwordInput.value;
+    let strength = 0;
+    if(val.length>=6) strength++;
+    if(/[A-Z]/.test(val)) strength++;
+    if(/[0-9]/.test(val)) strength++;
+    if(/[\W]/.test(val)) strength++;
+    switch(strength){
+        case 0: case 1: strengthBar.style.width="25%"; strengthBar.style.background="#dc3545"; strengthText.innerText="Weak"; break;
+        case 2: strengthBar.style.width="50%"; strengthBar.style.background="#ffc107"; strengthText.innerText="Medium"; break;
+        case 3: strengthBar.style.width="75%"; strengthBar.style.background="#17a2b8"; strengthText.innerText="Strong"; break;
+        case 4: strengthBar.style.width="100%"; strengthBar.style.background="#28a745"; strengthText.innerText="Very Strong"; break;
+    }
+    if(val===""){ strengthBar.style.width="0%"; strengthText.innerText=""; }
+});
+
+function login(){
+    if(isLocked) return;
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    const user = users.find(u => u.username===username && u.password===password);
+    if(user){
+        document.getElementById("message").innerText="Access Granted ✔";
+        document.getElementById("status").innerText="System Secure";
+        document.getElementById("status").style.background="#28a745";
+        addLog(`Successful login: ${username}`);
+        addDashboardLog(username,"Login Attempt","Success");
+        failedAttempts=0; document.getElementById("attempts").innerText="";
+        // Show dashboard
+        document.getElementById("login-card").style.display="none";
+        const dashboard=document.getElementById("dashboard");
+        dashboard.style.display="block";
+        document.getElementById("welcome").innerText=`Welcome, ${user.username}!`;
+        document.getElementById("role").innerText=`Role: ${user.role}`;
+        document.getElementById("login-time").innerText=`Login Time: ${new Date().toLocaleString()}`;
+
+        // Show admin dashboard only for admin
+        if(user.username==="admin"){
+            document.querySelector(".admin-dashboard").style.display="block";
+        } else {
+            document.querySelector(".admin-dashboard").style.display="none";
+        }
+    }else{
+        failedAttempts++;
+        document.getElementById("message").innerText="Invalid Credentials!";
+        document.getElementById("attempts").innerText=`Failed Attempts: ${failedAttempts}/${maxAttempts}`;
+        addLog(`Failed login attempt: ${username}`);
+        addDashboardLog(username,"Login Attempt","Failed");
+        if(failedAttempts>=maxAttempts){ lockAccount(); }
+    }
+}
+
+function lockAccount(){
+    isLocked=true;
+    let remainingTime=lockTime;
+    document.getElementById("status").innerText="Account Locked";
+    document.getElementById("status").style.background="#dc3545";
+    document.getElementById("message").innerText="Too many failed attempts!";
+    addLog("Account locked due to multiple failed attempts.");
+    addDashboardLog("SYSTEM","Account Lock Triggered","Locked");
+    const card=document.querySelector(".card");
+    card.classList.add("shake");
+    setTimeout(()=>card.classList.remove("shake"),500);
+    countdownInterval=setInterval(()=>{
+        document.getElementById("timer").innerText=`Try again in ${remainingTime} seconds`;
+        remainingTime--;
+        if(remainingTime<0){ clearInterval(countdownInterval); unlockAccount(); }
+    },1000);
+}
+
+function unlockAccount(){
+    isLocked=false; failedAttempts=0;
+    document.getElementById("status").innerText="System Secure";
+    document.getElementById("status").style.background="#28a745";
+    document.getElementById("message").innerText="You may try logging in again.";
+    document.getElementById("attempts").innerText="";
+    document.getElementById("timer").innerText="";
+    addLog("Account unlocked. System restored.");
+    addDashboardLog("SYSTEM","Account Unlocked","Restored");
+}
+
+function simulateAttack(){
+    if(isLocked) return;
+    document.getElementById("message").innerText="Brute Force Attack In Progress...";
+    addLog("Brute force attack simulation started.");
+    addDashboardLog("SIMULATION","Brute Force Attack Started","In Progress");
+    const fakeUser="admin";
+    const wrongPasswords=["123456","password","admin123","letmein"];
+    let attemptIndex=0;
+    function typeCredentials(username,password,callback){
+        let userField=document.getElementById("username");
+        let passField=document.getElementById("password");
+        userField.value=""; passField.value="";
+        let i=0;
+        let typingUser=setInterval(()=>{
+            userField.value+=username[i]; i++;
+            if(i>=username.length){ clearInterval(typingUser);
+                let j=0; let typingPass=setInterval(()=>{
+                    passField.value+=password[j]; j++;
+                    if(j>=password.length){ clearInterval(typingPass); setTimeout(callback,500); }
+                },Math.floor(Math.random()*70+80));
+            }
+        },Math.floor(Math.random()*70+80));
+    }
+    function attemptLogin(){
+        if(isLocked) return;
+        let passwordToTry=wrongPasswords[attemptIndex]; attemptIndex++;
+        typeCredentials(fakeUser,passwordToTry,()=>{
+            login();
+            if(attemptIndex<wrongPasswords.length && !isLocked){ setTimeout(attemptLogin,1000); }
+        });
+    }
+    attemptLogin();
+}
+
+function logout(){
+    document.getElementById("login-card").style.display="block";
+    document.getElementById("dashboard").style.display="none";
+    document.getElementById("username").value="";
+    document.getElementById("password").value="";
+    document.getElementById("message").innerText="";
+    document.getElementById("attempts").innerText="";
+    document.getElementById("timer").innerText="";
+    sessionStorage.removeItem("currentUser");
+    document.querySelector(".admin-dashboard").style.display="none";
+}
+</script>
+</body>
+</html>
